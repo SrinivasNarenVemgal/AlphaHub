@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AlphaHub – by Alphabuilders HQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* ─── RESET & ROOT ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #080808;
+      --surface:   #111111;
+      --surface2:  #1a1a1a;
+      --surface3:  #242424;
+      --border:    #222;
+      --border2:   #2e2e2e;
+      --orange:    #ff4800;
+      --orange2:   #ff6b35;
+      --orange3:   #ff8c5a;
+      --orange-glow: rgba(255,72,0,.15);
+      --orange-glow2: rgba(255,72,0,.08);
+      --text:      #f0ede8;
+      --text2:     #c8c4bc;
+      --muted:     #6b6560;
+      --muted2:    #3d3a36;
+      --blue:      #4ca8f5;
+      --green:     #3dd68c;
+      --red:       #ff4d6a;
+      --gold:      #f5c842;
+      --radius:    8px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --font-head: 'Bricolage Grotesque', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-accent: 'Space Grotesk', sans-serif;
+      --sidebar-w: 252px;
+      --nav-h:     62px;
+      --shadow:    0 8px 40px rgba(0,0,0,.7);
+      --shadow-sm: 0 2px 12px rgba(0,0,0,.4);
+      --glow:      0 0 40px rgba(255,72,0,.12);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      letter-spacing: -0.01em;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: var(--font-body); border: none; outline: none; }
+    input, textarea { font-family: var(--font-body); }
+    img { max-width: 100%; }
+
+    /* ─── SCROLLBAR ────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+
+    /* ─── TOAST ────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: var(--surface2); color: var(--text);
+      padding: 13px 22px; border-radius: 50px;
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--orange);
+      font-size: .86rem; font-family: var(--font-accent);
+      font-weight: 500; letter-spacing: .01em;
+      box-shadow: var(--shadow), var(--glow);
+      transform: translateY(80px) scale(.95); opacity: 0;
+      transition: all .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none;
+    }
+    #toast.show { transform: translateY(0) scale(1); opacity: 1; }
+
+    /* ─── MODAL OVERLAY ────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,.82); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border2); padding: 36px;
+      width: min(480px, 95vw); box-shadow: var(--shadow), var(--glow);
+      animation: slideUp .28s cubic-bezier(.34,1.2,.64,1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px) scale(.97); opacity: 0; }
+      to   { transform: translateY(0)    scale(1);   opacity: 1; }
+    }
+    .modal h2 { font-family: var(--font-head); font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -.03em; }
+    .modal p  { color: var(--muted); font-size: .87rem; margin-bottom: 24px; }
+    .modal-close {
+      position: absolute; top: 18px; right: 22px;
+      background: var(--surface2); color: var(--muted); font-size: 1rem;
+      line-height: 1; width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .modal-close:hover { color: var(--text); background: var(--surface3); }
+
+    /* ─── FORMS ────────────────────────────────────── */
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: .75rem; color: var(--muted); margin-bottom: 7px; letter-spacing: .06em; text-transform: uppercase; font-family: var(--font-accent); font-weight: 600; }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%; background: var(--surface2);
+      border: 1px solid var(--border2); border-radius: var(--radius);
+      color: var(--text); padding: 11px 14px; font-size: .94rem;
+      transition: border-color .2s, box-shadow .2s;
+      font-family: var(--font-body);
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: var(--orange); outline: none; box-shadow: 0 0 0 3px var(--orange-glow); }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .field select { appearance: none; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .field { flex: 1; }
+
+    /* ─── BUTTONS ──────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 20px; border-radius: 50px;
+      font-size: .875rem; font-weight: 600; transition: all .22s;
+      font-family: var(--font-accent); letter-spacing: .01em;
+    }
+    .btn-primary {
+      background: var(--orange); color: #fff;
+      box-shadow: 0 2px 16px rgba(255,72,0,.3);
+    }
+    .btn-primary:hover { background: var(--orange2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,72,0,.45); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost {
+      background: transparent; color: var(--text2);
+      border: 1px solid var(--border2);
+    }
+    .btn-ghost:hover { background: var(--surface2); border-color: var(--muted2); color: var(--text); }
+    .btn-sm { padding: 6px 14px; font-size: .8rem; }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn-icon { background: var(--surface2); color: var(--muted); border-radius: 10px; padding: 8px 10px; font-size: 1rem; transition: all .2s; border: 1px solid var(--border); }
+    .btn-icon:hover { color: var(--text); background: var(--surface3); border-color: var(--border2); }
+
+    /* ─── NAVBAR ───────────────────────────────────── */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      height: var(--nav-h);
+      background: rgba(8,8,8,.94); backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 20px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; flex-shrink: 0; user-select: none;
+    }
+    .nav-logo-icon {
+      width: 34px; height: 34px; flex-shrink: 0;
+    }
+    .nav-logo-text {
+      display: flex; flex-direction: column; line-height: 1;
+    }
+    .nav-logo-name {
+      font-family: var(--font-head); font-size: 1.22rem; font-weight: 800;
+      color: var(--text); letter-spacing: -.04em; line-height: 1.05;
+    }
+    .nav-logo-name span { color: var(--orange); }
+    .nav-logo-tagline {
+      font-family: var(--font-accent); font-size: .62rem; font-weight: 500;
+      color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .nav-search {
+      flex: 1; max-width: 420px; margin: 0 auto;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 50px; padding: 0 18px; height: 40px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .nav-search:focus-within { border-color: var(--muted2); box-shadow: 0 0 0 3px var(--orange-glow2); }
+    .nav-search input {
+      background: none; border: none; color: var(--text);
+      font-size: .9rem; flex: 1; outline: none; font-family: var(--font-body);
+    }
+    .nav-search input::placeholder { color: var(--muted); }
+    .nav-search .search-icon { color: var(--muted); font-size: .95rem; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    .nav-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-weight: 800; font-size: .85rem;
+      cursor: pointer; transition: all .2s;
+      box-shadow: 0 2px 12px rgba(255,72,0,.3);
+    }
+    .nav-avatar:hover { transform: scale(1.06); box-shadow: 0 4px 20px rgba(255,72,0,.45); }
+    .nav-dropdown {
+      position: absolute; top: calc(var(--nav-h) + 6px); right: 24px;
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--radius-lg); padding: 6px; min-width: 190px;
+      box-shadow: var(--shadow); z-index: 600; display: none;
+    }
+    .nav-dropdown.open { display: block; animation: slideUp .22s cubic-bezier(.34,1.2,.64,1); }
+    .nav-dropdown a, .nav-dropdown button {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 9px 13px; border-radius: 8px;
+      font-size: .88rem; color: var(--text2); background: none;
+      transition: background .15s; font-family: var(--font-body);
+    }
+    .nav-dropdown a:hover, .nav-dropdown button:hover { background: var(--surface2); color: var(--text); }
+    .nav-dropdown .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* ─── LAYOUT ───────────────────────────────────── */
+    #app { padding-top: var(--nav-h); min-height: 100vh; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr 288px;
+      gap: 0; max-width: 1320px; margin: 0 auto;
+      padding: 28px 20px;
+    }
+    @media (max-width: 1100px) {
+      .main-layout { grid-template-columns: var(--sidebar-w) 1fr; }
+      .right-sidebar { display: none; }
+    }
+    @media (max-width: 720px) {
+      .main-layout { grid-template-columns: 1fr; padding: 12px 10px; }
+      .left-sidebar { display: none; }
+    }
+
+    /* ─── LEFT SIDEBAR ─────────────────────────────── */
+    .left-sidebar { padding-right: 18px; }
+    .sidebar-section { margin-bottom: 4px; }
+    .sidebar-title {
+      font-size: .68rem; font-weight: 700; color: var(--muted);
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: 14px 14px 6px; font-family: var(--font-accent);
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 11px;
+      padding: 9px 14px; border-radius: 10px;
+      font-size: .88rem; font-weight: 500; color: var(--text2); cursor: pointer;
+      transition: background .15s, color .15s; font-family: var(--font-body);
+    }
+    .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+    .sidebar-item.active { background: var(--surface2); color: var(--orange); font-weight: 600; }
+    .sidebar-item .icon { font-size: 1rem; width: 20px; text-align: center; opacity: .75; }
+    .sidebar-item.active .icon { opacity: 1; }
+    .sidebar-community-dot {
+      width: 22px; height: 22px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .68rem; font-weight: 800; flex-shrink: 0;
+    }
+    .sidebar-divider { height: 1px; background: var(--border); margin: 8px 14px; }
+
+    /* ─── FEED / CENTER ────────────────────────────── */
+    .feed-area { padding: 0 10px; }
+    .sort-tabs {
+      display: flex; gap: 2px; background: var(--surface);
+      border-radius: 50px; padding: 4px; border: 1px solid var(--border2);
+      margin-bottom: 18px; width: fit-content;
+    }
+    .sort-tab {
+      padding: 7px 18px; border-radius: 50px;
+      font-size: .82rem; font-weight: 600; color: var(--muted);
+      background: none; transition: all .2s; font-family: var(--font-accent);
+      letter-spacing: .01em;
+    }
+    .sort-tab.active { background: var(--surface3); color: var(--text); box-shadow: var(--shadow-sm); }
+    .sort-tab:hover:not(.active) { color: var(--text2); }
+
+    /* ─── POST CARD ────────────────────────────────── */
+    .post-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); margin-bottom: 10px;
+      overflow: hidden; transition: border-color .25s, transform .2s, box-shadow .2s;
+    }
+    .post-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+    .post-card-inner { display: flex; }
+    .post-vote {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 14px 10px; gap: 3px;
+      background: rgba(255,255,255,.018); min-width: 52px;
+      border-right: 1px solid var(--border);
+    }
+    .vote-btn {
+      background: none; color: var(--muted); font-size: 1rem;
+      padding: 5px 7px; border-radius: 6px; transition: all .15s; line-height: 1;
+    }
+    .vote-btn:hover { color: var(--orange); background: var(--orange-glow); transform: scale(1.1); }
+    .vote-btn.up.voted { color: var(--orange); }
+    .vote-btn.down.voted { color: var(--blue); }
+    .vote-count { font-size: .78rem; font-weight: 800; color: var(--text); font-family: var(--font-accent); }
+    .post-body { flex: 1; padding: 14px 18px; min-width: 0; }
+    .post-meta {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .75rem; color: var(--muted); margin-bottom: 9px; flex-wrap: wrap;
+      font-family: var(--font-accent);
+    }
+    .post-community {
+      color: var(--orange); font-weight: 700;
+      display: flex; align-items: center; gap: 5px;
+      transition: opacity .15s;
+    }
+    .post-community:hover { opacity: .8; }
+    .post-author { color: var(--muted); transition: color .15s; }
+    .post-author:hover { color: var(--text2); }
+    .post-title {
+      font-family: var(--font-head); font-size: 1.05rem; font-weight: 700;
+      color: var(--text); margin-bottom: 9px; line-height: 1.42;
+      cursor: pointer; letter-spacing: -.02em;
+    }
+    .post-title:hover { color: var(--orange); }
+    .post-excerpt {
+      font-size: .875rem; color: var(--muted); line-height: 1.6;
+      margin-bottom: 11px;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .post-image {
+      width: 100%; max-height: 340px; object-fit: cover;
+      border-radius: 10px; margin-bottom: 12px; cursor: pointer;
+      transition: opacity .2s;
+    }
+    .post-image:hover { opacity: .92; }
+    .post-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .8rem; color: var(--blue); margin-bottom: 11px;
+      padding: 6px 12px; background: rgba(76,168,245,.1);
+      border-radius: 50px; border: 1px solid rgba(76,168,245,.15);
+      font-family: var(--font-accent); font-weight: 500;
+      transition: background .15s;
+    }
+    .post-link:hover { background: rgba(76,168,245,.18); }
+    .post-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; margin-top: 4px; }
+    .post-action-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 11px; border-radius: 8px;
+      font-size: .78rem; font-weight: 600; color: var(--muted); background: none;
+      transition: all .15s; font-family: var(--font-accent);
+    }
+    .post-action-btn:hover { background: var(--surface3); color: var(--text2); }
+    .post-tag {
+      display: inline-flex; align-items: center;
+      padding: 2px 9px; border-radius: 50px;
+      font-size: .68rem; font-weight: 700; margin-left: 4px;
+      font-family: var(--font-accent); letter-spacing: .04em;
+    }
+    .tag-text  { background: rgba(61,214,140,.1); color: var(--green); border: 1px solid rgba(61,214,140,.2); }
+    .tag-image { background: rgba(76,168,245,.1); color: var(--blue);  border: 1px solid rgba(76,168,245,.2); }
+    .tag-link  { background: rgba(255,77,106,.1); color: var(--red);   border: 1px solid rgba(255,77,106,.2); }
+
+    /* ─── RIGHT SIDEBAR ────────────────────────────── */
+    .right-sidebar { padding-left: 18px; }
+    .widget {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px;
+      margin-bottom: 14px;
+    }
+    .widget h3 {
+      font-family: var(--font-head); font-size: .92rem; font-weight: 800;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+      letter-spacing: -.02em; color: var(--text);
+    }
+    .widget h3 .wicon { font-size: .95rem; }
+    .community-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: all .15s;
+    }
+    .community-card:last-child { border-bottom: none; }
+    .community-card:hover { opacity: .78; transform: translateX(2px); }
+    .community-dot {
+      width: 34px; height: 34px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .82rem; font-weight: 800; flex-shrink: 0;
+      font-family: var(--font-head);
+    }
+    .community-info { flex: 1; }
+    .community-info .cname { font-size: .86rem; font-weight: 700; font-family: var(--font-head); }
+    .community-info .cmeta { font-size: .73rem; color: var(--muted); font-family: var(--font-accent); }
+    .rank-badge {
+      font-size: .75rem; font-weight: 800; color: var(--muted2); width: 22px; text-align: right;
+      font-family: var(--font-accent);
+    }
+
+    /* ─── COMMUNITY PAGE ───────────────────────────── */
+    .community-banner { height: 160px; position: relative; overflow: hidden; }
+    .community-banner-inner { height: 100%; width: 100%; }
+    .community-header-bar {
+      background: rgba(8,8,8,.9); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .community-header-content {
+      max-width: 1320px; margin: 0 auto;
+      display: flex; align-items: flex-end; gap: 18px;
+      padding: 14px 20px 16px;
+    }
+    .community-avatar-large {
+      width: 68px; height: 68px; border-radius: 16px;
+      border: 3px solid var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 900; margin-top: -36px;
+      font-family: var(--font-head); box-shadow: var(--shadow-sm);
+    }
+    .community-header-info h1 {
+      font-family: var(--font-head); font-size: 1.45rem; font-weight: 800; letter-spacing: -.03em;
+    }
+    .community-header-info .slug { color: var(--muted); font-size: .82rem; font-family: var(--font-accent); margin-top: 2px; }
+    .community-stats { display: flex; gap: 24px; margin-left: auto; align-items: center; }
+    .community-stat { text-align: center; }
+    .community-stat .val { font-family: var(--font-head); font-size: 1.15rem; font-weight: 800; }
+    .community-stat .lbl { font-size: .7rem; color: var(--muted); font-family: var(--font-accent); letter-spacing: .06em; text-transform: uppercase; }
+
+    /* ─── POST DETAIL ──────────────────────────────── */
+    .post-detail-wrap {
+      max-width: 1200px; margin: 0 auto; padding: 28px 20px;
+      display: grid; grid-template-columns: 1fr 300px; gap: 22px;
+    }
+    @media (max-width: 800px) { .post-detail-wrap { grid-template-columns: 1fr; } }
+    .post-detail-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .post-detail-vote {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.018);
+    }
+    .post-detail-body { padding: 22px; }
+    .post-detail-title {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 800;
+      margin-bottom: 14px; line-height: 1.3; letter-spacing: -.03em; color: var(--text);
+    }
+    .post-detail-content {
+      font-size: .95rem; line-height: 1.7; color: var(--text2);
+      margin-bottom: 18px;
+    }
+    .post-detail-image {
+      width: 100%; border-radius: 12px; margin-bottom: 18px;
+      max-height: 520px; object-fit: cover; cursor: pointer;
+      transition: opacity .2s;
+    }
+    .post-detail-image:hover { opacity: .9; }
+
+    /* ─── COMMENTS ─────────────────────────────────── */
+    .comments-section { margin-top: 22px; }
+    .comments-header {
+      font-family: var(--font-head); font-size: 1rem; font-weight: 800;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+      letter-spacing: -.02em;
+    }
+    .comment-box {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--radius-lg); padding: 18px; margin-bottom: 18px;
+    }
+    .comment-box textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius); color: var(--text); padding: 13px;
+      font-size: .9rem; resize: vertical; min-height: 90px; outline: none;
+      transition: border-color .2s, box-shadow .2s; font-family: var(--font-body);
+    }
+    .comment-box textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-glow); }
+    .comment-box .cbox-actions { display: flex; justify-content: flex-end; margin-top: 12px; gap: 8px; }
+    .comment-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 10px;
+      transition: border-color .2s;
+    }
+    .comment-item:hover { border-color: var(--border2); }
+    .comment-meta {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .76rem; color: var(--muted); margin-bottom: 9px;
+      font-family: var(--font-accent);
+    }
+    .comment-author { color: var(--text2); font-weight: 700; }
+    .comment-content { font-size: .9rem; line-height: 1.65; color: var(--text2); }
+    .comment-actions { display: flex; gap: 6px; margin-top: 12px; }
+    .comment-vote-btn {
+      background: none; color: var(--muted); font-size: .78rem;
+      display: flex; align-items: center; gap: 4px; padding: 5px 10px;
+      border-radius: 50px; transition: all .15s; font-family: var(--font-accent); font-weight: 600;
+    }
+    .comment-vote-btn:hover { color: var(--orange); background: var(--orange-glow); }
+    .comment-vote-btn.voted-up { color: var(--orange); }
+
+    /* ─── PROFILE ──────────────────────────────────── */
+    .profile-banner {
+      height: 160px;
+      background: linear-gradient(135deg, #100400 0%, #1e0800 40%, #2a0f00 70%, rgba(255,72,0,.25) 100%);
+      position: relative; overflow: hidden;
+    }
+    .profile-banner::after {
+      content: 'α'; position: absolute; right: -20px; bottom: -30px;
+      font-family: var(--font-head); font-size: 14rem; font-weight: 900;
+      color: rgba(255,72,0,.06); line-height: 1; pointer-events: none;
+    }
+    .profile-layout { max-width: 900px; margin: 0 auto; padding: 0 20px 48px; }
+    .profile-top {
+      display: flex; align-items: flex-end; gap: 18px;
+      margin-top: -40px; padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .profile-avatar-big {
+      width: 88px; height: 88px; border-radius: 20px;
+      border: 4px solid var(--bg); display: flex;
+      align-items: center; justify-content: center;
+      font-family: var(--font-head); font-size: 2rem; font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+    .profile-name { font-family: var(--font-head); font-size: 1.55rem; font-weight: 900; letter-spacing: -.03em; }
+    .profile-handle { color: var(--muted); font-size: .84rem; font-family: var(--font-accent); margin-top: 3px; }
+    .profile-stats { display: flex; gap: 28px; margin-left: auto; }
+    .profile-stat .val { font-family: var(--font-head); font-size: 1.25rem; font-weight: 800; }
+    .profile-stat .lbl { font-size: .72rem; color: var(--muted); font-family: var(--font-accent); letter-spacing: .05em; }
+    .profile-tabs {
+      display: flex; border-bottom: 1px solid var(--border); margin-bottom: 22px; margin-top: 20px;
+    }
+    .profile-tab {
+      padding: 12px 22px; font-size: .86rem; font-weight: 700;
+      color: var(--muted); background: none; border-bottom: 2px solid transparent;
+      transition: all .2s; font-family: var(--font-accent);
+    }
+    .profile-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+    /* ─── CREATE POST BAR ──────────────────────────── */
+    .create-post-area {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--radius-lg); padding: 13px 16px;
+      margin-bottom: 14px; display: flex; gap: 12px; align-items: center;
+      cursor: pointer; transition: border-color .2s, box-shadow .2s;
+    }
+    .create-post-area:hover { border-color: var(--muted2); box-shadow: 0 0 0 3px var(--orange-glow2); }
+    .create-post-placeholder {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 50px; padding: 9px 16px;
+      font-size: .88rem; color: var(--muted); font-family: var(--font-body);
+    }
+
+    /* ─── COMMUNITIES GRID ─────────────────────────── */
+    .communities-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+    .community-grid-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+      transition: border-color .25s, transform .2s, box-shadow .2s; cursor: pointer;
+    }
+    .community-grid-card:hover { border-color: var(--orange); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,.5), var(--glow); }
+    .community-card-banner { height: 80px; position: relative; }
+    .community-card-banner-letter {
+      position: absolute; right: 10px; bottom: -10px;
+      font-family: var(--font-head); font-size: 4rem; font-weight: 900;
+      opacity: .18; line-height: 1;
+    }
+    .community-card-body { padding: 16px; }
+    .community-card-body .cname {
+      font-family: var(--font-head); font-size: 1rem; font-weight: 800;
+      margin-bottom: 6px; letter-spacing: -.02em;
+    }
+    .community-card-body .cdesc {
+      font-size: .82rem; color: var(--muted); line-height: 1.55; margin-bottom: 14px;
+    }
+    .community-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .member-count { font-size: .76rem; color: var(--muted); font-family: var(--font-accent); font-weight: 500; }
+
+    /* ─── EMPTY STATES ─────────────────────────────── */
+    .empty-state { text-align: center; padding: 72px 20px; }
+    .empty-icon { font-size: 3.2rem; margin-bottom: 14px; }
+    .empty-state h3 { font-family: var(--font-head); font-size: 1.2rem; margin-bottom: 8px; font-weight: 800; }
+    .empty-state p { color: var(--muted); font-size: .88rem; margin-bottom: 22px; line-height: 1.55; }
+
+    /* ─── SKELETON LOADER ──────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position: 600px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+      background-size: 1200px 100%;
+      animation: shimmer 1.8s infinite ease-in-out; border-radius: 6px;
+    }
+    .sk-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 18px; margin-bottom: 10px;
+      display: flex; gap: 14px;
+    }
+    .sk-vote { width: 44px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+    .sk-body { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ─── AUTH ─────────────────────────────────────── */
+    .auth-logo-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+    .auth-logo-name { font-family: var(--font-head); font-size: 1.7rem; font-weight: 900; color: var(--text); letter-spacing: -.04em; }
+    .auth-logo-name span { color: var(--orange); }
+    .auth-sub { text-align: center; color: var(--muted); font-size: .86rem; margin-bottom: 28px; font-family: var(--font-accent); }
+    .auth-switch { text-align: center; margin-top: 18px; font-size: .86rem; color: var(--muted); font-family: var(--font-accent); }
+    .auth-switch a { color: var(--orange); font-weight: 700; cursor: pointer; }
+
+    /* ─── MISC ─────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 50px; font-size: .72rem; font-weight: 700;
+      font-family: var(--font-accent); letter-spacing: .03em;
+    }
+    .badge-orange { background: var(--orange-glow); color: var(--orange); border: 1px solid rgba(255,72,0,.2); }
+    .time-ago { color: var(--muted); font-size: .75rem; font-family: var(--font-accent); }
+    .dot-sep { color: var(--muted2); }
+    .divider-text {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--muted); font-size: .78rem; margin: 18px 0;
+    }
+    .divider-text::before, .divider-text::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ─── PAGE TRANSITIONS ─────────────────────────── */
+    .page { animation: fadeIn .25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ─── FLOATING ACTION ──────────────────────────── */
+    .fab {
+      position: fixed; bottom: 30px; right: 30px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #fff; font-size: 1.6rem; font-weight: 300;
+      box-shadow: 0 6px 28px rgba(255,72,0,.45);
+      z-index: 400; transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+      display: none; align-items: center; justify-content: center;
+    }
+    .fab:hover { transform: scale(1.12) rotate(90deg); box-shadow: 0 10px 36px rgba(255,72,0,.6); }
+
+    /* ─── TABS ─────────────────────────────────────── */
+    .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 22px; }
+    .tab-btn {
+      padding: 11px 20px; font-size: .86rem; font-weight: 700;
+      color: var(--muted); background: none; border-bottom: 2px solid transparent;
+      transition: all .2s; font-family: var(--font-accent); letter-spacing: .01em;
+    }
+    .tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+    /* ─── FULL WIDTH PAGE ──────────────────────────── */
+    .full-width-page { max-width: 1320px; margin: 0 auto; padding: 28px 20px; }
+
+    /* ─── NOTIF BADGE ──────────────────────────────── */
+    .notif-badge {
+      background: var(--orange); color: #fff;
+      font-size: .62rem; font-weight: 800; border-radius: 10px;
+      padding: 1px 5px; position: absolute; top: -4px; right: -4px;
+      font-family: var(--font-accent);
+    }
+
+    /* ─── HOVER LIFT ───────────────────────────────── */
+    .hover-lift { transition: transform .2s, box-shadow .2s; }
+    .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  </style>
+</head>
+<body>
+
+<!-- ══ TOAST ══════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ══ NAVBAR ═════════════════════════════════════════ -->
+<nav id="navbar">
+  <!-- SVG LOGO -->
+  <div class="nav-logo" onclick="navigate('home')">
+    <svg class="nav-logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lg1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#ff4800"/>
+          <stop offset="100%" stop-color="#ff8c5a"/>
+        </linearGradient>
+        <linearGradient id="lg2" x1="40" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#ff4800" stop-opacity=".35"/>
+          <stop offset="100%" stop-color="#ff8c5a" stop-opacity=".08"/>
+        </linearGradient>
+      </defs>
+      <!-- Hexagon base -->
+      <path d="M20 2 L36 11 L36 29 L20 38 L4 29 L4 11 Z" fill="url(#lg2)" stroke="url(#lg1)" stroke-width="1.5"/>
+      <!-- Bold A mark -->
+      <path d="M13 30 L20 10 L27 30" stroke="url(#lg1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M15.5 23 L24.5 23" stroke="url(#lg1)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Top accent dot -->
+      <circle cx="20" cy="10" r="2" fill="#ff4800"/>
+    </svg>
+    <div class="nav-logo-text">
+      <div class="nav-logo-name">Alpha<span>Hub</span></div>
+      <div class="nav-logo-tagline">by Alphabuilders HQ</div>
+    </div>
+  </div>
+
+  <div class="nav-search">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="search-icon" style="flex-shrink:0">
+      <circle cx="7" cy="7" r="5.5" stroke="#6b6560" stroke-width="1.5"/>
+      <path d="M11 11 L14.5 14.5" stroke="#6b6560" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <input type="text" placeholder="Search communities, posts…" id="searchInput" oninput="handleSearch(this.value)"/>
+    <span style="font-size:.72rem;color:var(--muted2);font-family:var(--font-accent);background:var(--surface3);padding:2px 7px;border-radius:4px;border:1px solid var(--border);white-space:nowrap">⌘K</span>
+  </div>
+
+  <div class="nav-actions" id="navActions"></div>
+</nav>
+
+<!-- ══ APP ════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ▸ HOME PAGE -->
+  <div id="page-home" class="page">
+    <div class="main-layout">
+      <!-- LEFT SIDEBAR -->
+      <aside class="left-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-item active" onclick="navigate('home')" id="nav-home">
+            <span class="icon">⌂</span> Home
+          </div>
+          <div class="sidebar-item" onclick="navigate('communities')" id="nav-communities">
+            <span class="icon">◉</span> Communities
+          </div>
+          <div class="sidebar-item" onclick="requireAuth(()=>openCreatePost())" id="nav-create">
+            <span class="icon">＋</span> Create Post
+          </div>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section" id="myCommunities"></div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">Explore</div>
+          <div class="sidebar-item" onclick="setFilter('trending')">
+            <span class="icon">↑</span> Trending
+          </div>
+          <div class="sidebar-item" onclick="setFilter('new')">
+            <span class="icon">◈</span> New &amp; Rising
+          </div>
+        </div>
+      </aside>
+
+      <!-- FEED -->
+      <main class="feed-area">
+        <div class="create-post-area" onclick="requireAuth(()=>openCreatePost())">
+          <div class="nav-avatar" id="feedAvatar" style="width:36px;height:36px;font-size:.8rem">α</div>
+          <div class="create-post-placeholder">What's on your mind?</div>
+          <button class="btn btn-primary btn-sm">Post</button>
+        </div>
+
+        <div class="sort-tabs">
+          <button class="sort-tab active" onclick="setSort('hot',this)">🔥 Hot</button>
+          <button class="sort-tab" onclick="setSort('new',this)">✦ New</button>
+          <button class="sort-tab" onclick="setSort('top',this)">↑ Top</button>
+        </div>
+
+        <div id="skeletonFeed"></div>
+        <div id="postFeed"></div>
+      </main>
+
+      <!-- RIGHT SIDEBAR -->
+      <aside class="right-sidebar">
+        <div class="widget" style="background:linear-gradient(145deg,#0e0400,#1c0900);border-color:#2a1200;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+              <path d="M20 2 L36 11 L36 29 L20 38 L4 29 L4 11 Z" fill="rgba(255,72,0,.15)" stroke="#ff4800" stroke-width="1.5"/>
+              <path d="M13 30 L20 10 L27 30" stroke="#ff4800" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M15.5 23 L24.5 23" stroke="#ff4800" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="20" cy="10" r="2" fill="#ff4800"/>
+            </svg>
+            <span style="font-family:var(--font-head);font-weight:900;font-size:1.05rem;letter-spacing:-.03em">Alpha<span style="color:var(--orange)">Hub</span></span>
+          </div>
+          <p style="font-size:.83rem;color:var(--muted);line-height:1.6;margin-bottom:16px">The hub where builders share ideas, get feedback, and grow together.</p>
+          <button class="btn btn-primary btn-full btn-sm" onclick="navigate('communities')">Explore Communities →</button>
+        </div>
+        <div class="widget">
+          <h3><span class="wicon">🔥</span> Top Communities</h3>
+          <div id="topCommunitiesWidget"></div>
+        </div>
+        <div class="widget">
+          <h3><span class="wicon">📋</span> Community Guidelines</h3>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--muted)"><span style="color:var(--orange);font-weight:800;font-family:var(--font-accent);min-width:16px">1</span>Be respectful &amp; kind</div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--muted)"><span style="color:var(--orange);font-weight:800;font-family:var(--font-accent);min-width:16px">2</span>No spam or self-promotion</div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--muted)"><span style="color:var(--orange);font-weight:800;font-family:var(--font-accent);min-width:16px">3</span>Stay on topic</div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--muted)"><span style="color:var(--orange);font-weight:800;font-family:var(--font-accent);min-width:16px">4</span>No misinformation</div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--muted)"><span style="color:var(--orange);font-weight:800;font-family:var(--font-accent);min-width:16px">5</span>Follow community rules</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ▸ COMMUNITIES PAGE -->
+  <div id="page-communities" class="page">
+    <div class="full-width-page">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-family:var(--font-accent);font-size:.72rem;color:var(--orange);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Explore</div>
+          <h1 style="font-family:var(--font-head);font-size:2rem;font-weight:900;letter-spacing:-.04em;line-height:1">Communities</h1>
+          <p style="color:var(--muted);font-size:.88rem;margin-top:6px;font-family:var(--font-accent)">Find your people. Join the conversation.</p>
+        </div>
+        <button class="btn btn-primary" onclick="requireAuth(()=>openCreateCommunity())">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          New Community
+        </button>
+      </div>
+      <div class="communities-grid" id="communitiesGrid"></div>
+    </div>
+  </div>
+
+  <!-- ▸ COMMUNITY DETAIL PAGE -->
+  <div id="page-community" class="page">
+    <div class="community-banner" id="communityBanner"></div>
+    <div class="community-header-bar">
+      <div class="community-header-content" id="communityHeader"></div>
+    </div>
+    <div class="main-layout" style="padding-top:16px">
+      <aside class="left-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-item" onclick="navigate('home')"><span class="icon">🏠</span> Home</div>
+          <div class="sidebar-item" onclick="navigate('communities')"><span class="icon">🌐</span> All Communities</div>
+          <div class="sidebar-item" onclick="requireAuth(()=>openCreatePost(currentCommunity?.id))"><span class="icon">✏️</span> Create Post Here</div>
+        </div>
+      </aside>
+      <main class="feed-area">
+        <div class="sort-tabs">
+          <button class="sort-tab active" onclick="setSort('hot',this)">🔥 Hot</button>
+          <button class="sort-tab" onclick="setSort('new',this)">✨ New</button>
+          <button class="sort-tab" onclick="setSort('top',this)">📈 Top</button>
+        </div>
+        <div id="communityFeed"></div>
+      </main>
+      <aside class="right-sidebar">
+        <div class="widget" id="communityAbout"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ▸ POST DETAIL PAGE -->
+  <div id="page-post" class="page">
+    <div class="post-detail-wrap" id="postDetailWrap"></div>
+  </div>
+
+  <!-- ▸ PROFILE PAGE -->
+  <div id="page-profile" class="page">
+    <div class="profile-banner"></div>
+    <div class="profile-layout">
+      <div class="profile-top" id="profileTop"></div>
+      <div class="profile-tabs">
+        <button class="profile-tab active" onclick="switchProfileTab('posts',this)">Posts</button>
+        <button class="profile-tab" onclick="switchProfileTab('comments',this)">Comments</button>
+        <button class="profile-tab" onclick="switchProfileTab('communities',this)">Communities</button>
+      </div>
+      <div id="profileContent"></div>
+    </div>
+  </div>
+
+  <!-- ▸ SEARCH RESULTS PAGE -->
+  <div id="page-search" class="page">
+    <div class="full-width-page">
+      <div style="margin-bottom:24px">
+        <div style="font-family:var(--font-accent);font-size:.72rem;color:var(--muted);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Search Results</div>
+        <h2 style="font-family:var(--font-head);font-size:1.6rem;font-weight:900;letter-spacing:-.03em">
+          "<span id="searchTerm" style="color:var(--orange)"></span>"
+        </h2>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchSearchTab('posts',this)">Posts</button>
+        <button class="tab-btn" onclick="switchSearchTab('communities',this)">Communities</button>
+      </div>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- ══ FAB ════════════════════════════════════════════ -->
+<button class="fab" id="fab" onclick="requireAuth(()=>openCreatePost())">＋</button>
+
+<!-- ══ MODALS ══════════════════════════════════════════ -->
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal('authModal')">×</button>
+    <div id="authModalBody"></div>
+  </div>
+</div>
+
+<!-- CREATE POST MODAL -->
+<div class="modal-overlay" id="createPostModal">
+  <div class="modal" style="position:relative;max-width:600px;width:95vw">
+    <button class="modal-close" onclick="closeModal('createPostModal')">×</button>
+    <h2>Create a Post</h2>
+    <p>Share something with the community</p>
+
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab-btn active" onclick="switchPostType('text',this)">📝 Text</button>
+      <button class="tab-btn" onclick="switchPostType('image',this)">🖼️ Image</button>
+      <button class="tab-btn" onclick="switchPostType('link',this)">🔗 Link</button>
+    </div>
+
+    <div class="field">
+      <label>Community</label>
+      <select id="postCommunity"></select>
+    </div>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="postTitle" placeholder="An interesting title…" maxlength="300"/>
+    </div>
+    <div id="postBodyArea">
+      <div class="field" id="textArea">
+        <label>Content (optional)</label>
+        <textarea id="postContent" placeholder="Write something…" style="min-height:120px"></textarea>
+      </div>
+      <div class="field" id="imageArea" style="display:none">
+        <label>Image</label>
+        <div id="imageDropZone" onclick="document.getElementById('imageFileInput').click()"
+          style="border:2px dashed var(--border);border-radius:10px;padding:30px;text-align:center;cursor:pointer;transition:border-color .2s"
+          ondragover="event.preventDefault();this.style.borderColor='var(--orange)'"
+          ondragleave="this.style.borderColor='var(--border)'"
+          ondrop="handleImageDrop(event)">
+          <div style="font-size:2rem;margin-bottom:8px">📁</div>
+          <div style="color:var(--muted);font-size:.88rem">Click or drag an image here</div>
+          <input type="file" id="imageFileInput" accept="image/*" style="display:none" onchange="handleImageSelect(event)"/>
+        </div>
+        <div id="imagePreview" style="margin-top:10px;display:none">
+          <img id="previewImg" style="max-height:200px;border-radius:8px;object-fit:cover"/>
+          <button onclick="clearImage()" style="display:block;margin-top:6px;color:var(--red);background:none;font-size:.82rem">Remove image</button>
+        </div>
+      </div>
+      <div class="field" id="linkArea" style="display:none">
+        <label>URL</label>
+        <input type="url" id="postLink" placeholder="https://…"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeModal('createPostModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitPost()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE COMMUNITY MODAL -->
+<div class="modal-overlay" id="createCommunityModal">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal('createCommunityModal')">×</button>
+    <h2>Create Community</h2>
+    <p>Build a space for your community</p>
+    <div class="field">
+      <label>Community Name</label>
+      <input type="text" id="communityName" placeholder="e.g. WebDev" maxlength="50" oninput="updateSlugPreview(this.value)"/>
+    </div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">
+      Slug: <span id="slugPreview" style="color:var(--orange)">…</span>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="communityDesc" placeholder="What is this community about?" style="min-height:80px"></textarea>
+    </div>
+    <div class="field">
+      <label>Theme Color</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="colorPicker">
+        <!-- filled by JS -->
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-ghost" onclick="closeModal('createCommunityModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCommunity()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE LIGHTBOX -->
+<div class="modal-overlay" id="lightbox" onclick="closeModal('lightbox')">
+  <img id="lightboxImg" style="max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain"/>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   ALPHAHUB — Complete SPA
+   by Alphabuilders HQ
+═══════════════════════════════════════════════════════ */
+
+/* ─── STATE ──────────────────────────────────────────── */
+let state = {
+  currentUser: null,
+  posts: [],
+  communities: [],
+  comments: [],
+  votes: {},          // postId -> 'up'|'down'|null
+  commentVotes: {},   // commentId -> 'up'|'down'|null
+  joinedCommunities: [],
+  sort: 'hot',
+  postType: 'text',
+  selectedColor: '#ff4500',
+  currentImageData: null,
+};
+let currentPage = 'home';
+let currentCommunity = null;
+let currentPost = null;
+let profileTab = 'posts';
+let searchTab = 'posts';
+let navDropOpen = false;
+
+/* ─── SEED DATA ──────────────────────────────────────── */
+const COMMUNITY_COLORS = ['#ff4800','#0079d3','#3dd68c','#ff4d6a','#f5c842','#9c27b0','#00b8d9','#ff8c00','#e91e63','#00897b'];
+
+function seedData() {
+  const communities = [
+    { id:'c1', name:'WebDevelopment', slug:'webdev', desc:'Discuss all things web dev — frontend, backend, and everything in between.', color:'#0079d3', members:4821, createdAt: Date.now()-86400000*30 },
+    { id:'c2', name:'StartupFounders', slug:'startups', desc:'For founders, entrepreneurs, and startup enthusiasts.', color:'#ff4800', members:3102, createdAt: Date.now()-86400000*20 },
+    { id:'c3', name:'DesignCraft', slug:'design', desc:'UI/UX design, graphic design, and visual arts discussion.', color:'#9c27b0', members:2500, createdAt: Date.now()-86400000*15 },
+    { id:'c4', name:'DevOps&Cloud', slug:'devops', desc:'DevOps practices, cloud platforms, and infrastructure talk.', color:'#3dd68c', members:1987, createdAt: Date.now()-86400000*10 },
+    { id:'c5', name:'AlphaBuilders', slug:'alphabuilders', desc:'Official community for Alphabuilders HQ members. Build in public.', color:'#ff8c00', members:892, createdAt: Date.now()-86400000*5 },
+  ];
+
+  const users = ['alex_dev','sarah_builds','johndoe','techie99','designlover'];
+  const posts = [
+    { id:'p1', title:'I built a full-stack app in 48 hours — here\'s what I learned', content:'Last weekend I challenged myself to build and ship a complete app from scratch in 48 hours. Here\'s the tech stack I used, the decisions I made, and what I\'d do differently.', type:'text', communityId:'c2', author:'alex_dev', authorId:'u2', votes:482, createdAt: Date.now()-3600000*2, comments:34 },
+    { id:'p2', title:'CSS Grid vs Flexbox: A complete guide for 2025', content:'Still confused about when to use Grid vs Flexbox? This guide breaks it down with real examples and best practices for modern layouts.', type:'text', communityId:'c1', author:'sarah_builds', authorId:'u3', votes:319, createdAt: Date.now()-3600000*5, comments:27 },
+    { id:'p3', title:'Show AlphaHub: My portfolio redesign — brutal feedback welcome!', content:'Finally redesigned my portfolio after 3 years. Went for a dark, minimal aesthetic. Roast it.', type:'image', imageUrl:'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80', communityId:'c3', author:'designlover', authorId:'u5', votes:205, createdAt: Date.now()-3600000*8, comments:52 },
+    { id:'p4', title:'Docker + Kubernetes for beginners: The setup I wish I had', content:'I spent weeks figuring this out. Here\'s the exact setup that finally made containerization click for me.', type:'text', communityId:'c4', author:'techie99', authorId:'u4', votes:178, createdAt: Date.now()-3600000*12, comments:19 },
+    { id:'p5', title:'Alphabuilders HQ is now live! 🎉', content:'After months of work, our platform is finally live. Welcome to all the early members — let\'s build something amazing together.', type:'text', communityId:'c5', author:'alex_dev', authorId:'u2', votes:621, createdAt: Date.now()-3600000*1, comments:88 },
+    { id:'p6', title:'Next.js 15 vs Remix: Which should you choose in 2025?', content:'A deep comparison of the two most popular React meta-frameworks today, with real benchmarks and DX comparisons.', type:'link', link:'https://nextjs.org', communityId:'c1', author:'johndoe', authorId:'u1', votes:294, createdAt: Date.now()-3600000*18, comments:41 },
+    { id:'p7', title:'I raised my first $500k — here\'s the exact pitch deck', content:'After 47 rejections, we finally closed our pre-seed round. Sharing our pitch deck (redacted) and the lessons learned.', type:'image', imageUrl:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80', communityId:'c2', author:'sarah_builds', authorId:'u3', votes:887, createdAt: Date.now()-3600000*24, comments:132 },
+    { id:'p8', title:'The color system I use for every design project', content:'A simple, systematic approach to picking colors that look great and maintain contrast ratios.', type:'text', communityId:'c3', author:'designlover', authorId:'u5', votes:156, createdAt: Date.now()-3600000*30, comments:15 },
+  ];
+
+  const comments = [
+    { id:'cm1', postId:'p1', content:'This is incredibly inspiring. What framework did you use for the backend?', author:'techie99', authorId:'u4', votes:45, createdAt: Date.now()-3600000*1 },
+    { id:'cm2', postId:'p1', content:'Great write-up! The 48-hour constraint is a great way to avoid over-engineering.', author:'johndoe', authorId:'u1', votes:32, createdAt: Date.now()-3600000*1.5 },
+    { id:'cm3', postId:'p1', content:'Did you use any AI tools to speed things up?', author:'designlover', authorId:'u5', votes:18, createdAt: Date.now()-3600000*2 },
+    { id:'cm4', postId:'p5', content:'So excited for this! The community vibe is already amazing.', author:'sarah_builds', authorId:'u3', votes:67, createdAt: Date.now()-1800000 },
+    { id:'cm5', postId:'p5', content:'Been waiting for this. AlphaHub is going to be huge!', author:'techie99', authorId:'u4', votes:43, createdAt: Date.now()-900000 },
+    { id:'cm6', postId:'p2', content:'Finally a clear explanation. I always defaulted to flex for everything, but this makes me want to use grid more.', author:'alex_dev', authorId:'u2', votes:28, createdAt: Date.now()-3600000*3 },
+    { id:'cm7', postId:'p3', content:'Love the minimalism. Maybe add a bit more contrast on the project cards?', author:'johndoe', authorId:'u1', votes:15, createdAt: Date.now()-3600000*6 },
+    { id:'cm8', postId:'p7', content:'The deck is beautiful. Slide 7 is especially strong. What was the main objection you kept hearing?', author:'alex_dev', authorId:'u2', votes:89, createdAt: Date.now()-3600000*20 },
+  ];
+
+  state.communities = communities;
+  state.posts = posts;
+  state.comments = comments;
+}
+
+/* ─── UTILS ──────────────────────────────────────────── */
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const s = Math.floor(diff/1000);
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s/60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m/60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h/24);
+  return `${d}d ago`;
+}
+
+function fmtNum(n) {
+  if (n >= 1000) return (n/1000).toFixed(1)+'k';
+  return n;
+}
+
+function slugify(s) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+
+function getCommunity(id) {
+  return state.communities.find(c => c.id === id);
+}
+
+function getPost(id) {
+  return state.posts.find(p => p.id === id);
+}
+
+function toast(msg, duration=2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function randomId() {
+  return Math.random().toString(36).slice(2,9);
+}
+
+/* ─── NAVIGATION ─────────────────────────────────────── */
+function navigate(page, data) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-'+page);
+  if (el) { el.classList.add('active'); currentPage = page; }
+
+  // sidebar active
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  if (page === 'home') document.getElementById('nav-home')?.classList.add('active');
+  if (page === 'communities') document.getElementById('nav-communities')?.classList.add('active');
+
+  // fab visibility
+  document.getElementById('fab').style.display = (page==='home'||page==='community') ? 'flex' : 'none';
+
+  if (page === 'home')        renderHome();
+  if (page === 'communities') renderCommunities();
+  if (page === 'community')   renderCommunityPage(data);
+  if (page === 'post')        renderPostDetail(data);
+  if (page === 'profile')     renderProfile(data);
+
+  window.scrollTo(0,0);
+}
+
+function setSort(s, btn) {
+  state.sort = s;
+  document.querySelectorAll('.sort-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (currentPage === 'home') renderFeed();
+  if (currentPage === 'community') renderCommunityFeed(currentCommunity?.id);
+}
+
+function setFilter(f) {
+  state.sort = f === 'trending' ? 'top' : 'new';
+  navigate('home');
+}
+
+/* ─── AUTH ───────────────────────────────────────────── */
+function requireAuth(cb) {
+  if (state.currentUser) { cb(); return; }
+  openAuthModal('login', cb);
+}
+
+let authCallback = null;
+function openAuthModal(mode='login', cb=null) {
+  authCallback = cb;
+  renderAuthModal(mode);
+  document.getElementById('authModal').classList.add('open');
+}
+
+function renderAuthModal(mode) {
+  const isLogin = mode === 'login';
+  document.getElementById('authModalBody').innerHTML = `
+    <div class="auth-logo-wrap">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+        <path d="M20 2 L36 11 L36 29 L20 38 L4 29 L4 11 Z" fill="rgba(255,72,0,.15)" stroke="#ff4800" stroke-width="1.5"/>
+        <path d="M13 30 L20 10 L27 30" stroke="#ff4800" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M15.5 23 L24.5 23" stroke="#ff4800" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="20" cy="10" r="2" fill="#ff4800"/>
+      </svg>
+      <div class="auth-logo-name">Alpha<span>Hub</span></div>
+    </div>
+    <p class="auth-sub">${isLogin ? 'Welcome back, builder. Sign in to continue.' : 'Join thousands of builders on AlphaHub.'}</p>
+    ${!isLogin ? `
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="authUsername" placeholder="your_handle" autocomplete="username"/>
+    </div>` : ''}
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="authPassword" placeholder="••••••••" autocomplete="${isLogin?'current-password':'new-password'}"/>
+    </div>
+    <button class="btn btn-primary btn-full" style="margin-top:4px" onclick="${isLogin?'doLogin()':'doSignup()'}">
+      ${isLogin ? 'Sign In →' : 'Create Account →'}
+    </button>
+    <div class="auth-switch">
+      ${isLogin
+        ? `New to AlphaHub? <a onclick="renderAuthModal('signup')">Create account</a>`
+        : `Already have an account? <a onclick="renderAuthModal('login')">Sign in</a>`}
+    </div>
+  `;
+}
+
+function doLogin() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPassword').value;
+  if (!email || !pass) { toast('Please fill all fields'); return; }
+
+  // Simulate auth — accept any credentials
+  const username = email.split('@')[0].replace(/[^a-z0-9_]/gi,'_');
+  state.currentUser = {
+    id: 'u_'+randomId(),
+    username,
+    email,
+    avatar: username[0].toUpperCase(),
+    karma: Math.floor(Math.random()*800)+50,
+    joinedAt: Date.now(),
+  };
+  state.joinedCommunities = ['c5'];
+  closeModal('authModal');
+  updateNavAuth();
+  renderSidebar();
+  toast(`Welcome back, ${username}! 👋`);
+  if (authCallback) { authCallback(); authCallback = null; }
+}
+
+function doSignup() {
+  const username = document.getElementById('authUsername')?.value.trim();
+  const email    = document.getElementById('authEmail').value.trim();
+  const pass     = document.getElementById('authPassword').value;
+  if (!username || !email || !pass) { toast('Please fill all fields'); return; }
+  if (username.length < 3) { toast('Username must be at least 3 characters'); return; }
+
+  state.currentUser = {
+    id: 'u_'+randomId(),
+    username,
+    email,
+    avatar: username[0].toUpperCase(),
+    karma: 1,
+    joinedAt: Date.now(),
+  };
+  state.joinedCommunities = ['c5'];
+  closeModal('authModal');
+  updateNavAuth();
+  renderSidebar();
+  toast(`Welcome to AlphaHub, ${username}! 🎉`);
+  if (authCallback) { authCallback(); authCallback = null; }
+}
+
+function doLogout() {
+  state.currentUser = null;
+  state.joinedCommunities = [];
+  navDropOpen = false;
+  document.getElementById('navDropdown')?.remove();
+  updateNavAuth();
+  renderSidebar();
+  navigate('home');
+  toast('Logged out. See you soon!');
+}
+
+function updateNavAuth() {
+  const actions = document.getElementById('navActions');
+  if (state.currentUser) {
+    actions.innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="requireAuth(()=>openCreatePost())" style="gap:6px">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Create
+      </button>
+      <div style="position:relative">
+        <div class="nav-avatar" onclick="toggleNavDrop()" title="${state.currentUser.username}">${state.currentUser.avatar}</div>
+        <div class="nav-dropdown" id="navDropdown">
+          <div style="padding:10px 13px 8px;border-bottom:1px solid var(--border);margin-bottom:4px">
+            <div style="font-weight:700;font-size:.88rem;font-family:var(--font-head)">${state.currentUser.username}</div>
+            <div style="font-size:.74rem;color:var(--muted);font-family:var(--font-accent)">${state.currentUser.email}</div>
+          </div>
+          <a onclick="navigate('profile');closeNavDrop()">👤 &nbsp;Profile</a>
+          <a onclick="navigate('communities');closeNavDrop()">◉ &nbsp;Communities</a>
+          <div class="divider"></div>
+          <button onclick="doLogout()" style="color:var(--red)">↪ &nbsp;Log Out</button>
+        </div>
+      </div>
+    `;
+    const fa = document.getElementById('feedAvatar');
+    if (fa) fa.textContent = state.currentUser.avatar;
+  } else {
+    actions.innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="openAuthModal('login')">Log In</button>
+      <button class="btn btn-primary btn-sm" onclick="openAuthModal('signup')">Get Started</button>
+    `;
+  }
+}
+
+function toggleNavDrop() {
+  navDropOpen = !navDropOpen;
+  const d = document.getElementById('navDropdown');
+  if (d) d.classList.toggle('open', navDropOpen);
+}
+function closeNavDrop() {
+  navDropOpen = false;
+  document.getElementById('navDropdown')?.classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-avatar') && !e.target.closest('#navDropdown')) {
+    closeNavDrop();
+  }
+});
+
+/* ─── MODAL HELPERS ─────────────────────────────────── */
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ─── SIDEBAR ───────────────────────────────────────── */
+function renderSidebar() {
+  const mc = document.getElementById('myCommunities');
+  if (!mc) return;
+  if (!state.currentUser || state.joinedCommunities.length === 0) {
+    mc.innerHTML = '';
+    return;
+  }
+  mc.innerHTML = '<div class="sidebar-title">My Communities</div>';
+  state.joinedCommunities.forEach(cid => {
+    const c = getCommunity(cid);
+    if (!c) return;
+    const div = document.createElement('div');
+    div.className = 'sidebar-item';
+    div.onclick = () => navigate('community', c.id);
+    div.innerHTML = `
+      <div class="sidebar-community-dot" style="background:${c.color}22;color:${c.color};border:1px solid ${c.color}44;border-radius:6px">${c.name[0]}</div>
+      <span style="font-weight:600">${c.name}</span>
+    `;
+    mc.appendChild(div);
+  });
+}
+
+/* ─── HOME ───────────────────────────────────────────── */
+function renderHome() {
+  renderSidebar();
+  renderTopCommunities();
+  showSkeletons();
+  setTimeout(() => {
+    document.getElementById('skeletonFeed').innerHTML = '';
+    renderFeed();
+  }, 600);
+  updateNavAuth();
+}
+
+function showSkeletons() {
+  let html = '';
+  for (let i=0;i<3;i++) {
+    html += `<div class="sk-card">
+      <div class="sk-vote"><div class="skeleton" style="height:20px"></div><div class="skeleton" style="height:14px"></div><div class="skeleton" style="height:20px"></div></div>
+      <div class="sk-body">
+        <div class="skeleton" style="height:12px;width:40%"></div>
+        <div class="skeleton" style="height:20px;width:80%"></div>
+        <div class="skeleton" style="height:14px;width:60%"></div>
+        <div class="skeleton" style="height:14px;width:90%"></div>
+        <div class="skeleton" style="height:14px;width:50%"></div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('skeletonFeed').innerHTML = html;
+}
+
+function getSortedPosts(filter) {
+  let posts = [...state.posts];
+  if (filter) posts = posts.filter(p => p.communityId === filter);
+  if (state.sort === 'new') posts.sort((a,b) => b.createdAt - a.createdAt);
+  else if (state.sort === 'top') posts.sort((a,b) => (b.votes + (state.votes[b.id]==='up'?1:state.votes[b.id]==='down'?-1:0)) - (a.votes + (state.votes[a.id]==='up'?1:state.votes[a.id]==='down'?-1:0)));
+  else posts.sort((a,b) => {
+    const sa = (b.votes + (state.votes[b.id]==='up'?1:0)) / Math.pow((Date.now()-b.createdAt)/3600000+2,1.5);
+    const sb = (a.votes + (state.votes[a.id]==='up'?1:0)) / Math.pow((Date.now()-a.createdAt)/3600000+2,1.5);
+    return sa - sb;
+  });
+  return posts;
+}
+
+function renderFeed(filter) {
+  const posts = getSortedPosts(filter);
+  const feed = document.getElementById('postFeed');
+  if (!feed) return;
+  if (posts.length === 0) {
+    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><h3>No posts yet</h3><p>Be the first to post in this community!</p><button class="btn btn-primary" onclick="requireAuth(()=>openCreatePost())">Create Post</button></div>`;
+    return;
+  }
+  feed.innerHTML = posts.map(p => renderPostCard(p)).join('');
+}
+
+function renderPostCard(post) {
+  const comm = getCommunity(post.communityId);
+  const voteState = state.votes[post.id] || null;
+  const voteCount = post.votes + (voteState==='up'?1:voteState==='down'?-1:0);
+  const commentsCount = state.comments.filter(c => c.postId === post.id).length || post.comments || 0;
+
+  let mediaHtml = '';
+  if (post.type==='image' && post.imageUrl) {
+    mediaHtml = `<img class="post-image" src="${post.imageUrl}" alt="Post image" onclick="openLightbox('${post.imageUrl}')" loading="lazy"/>`;
+  } else if (post.type==='text' && post.content) {
+    mediaHtml = `<div class="post-excerpt">${post.content}</div>`;
+  } else if (post.type==='link' && post.link) {
+    mediaHtml = `<a class="post-link" href="${post.link}" target="_blank">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-3M9 2h5m0 0v5m0-5L8 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      ${post.link}
+    </a>`;
+  }
+
+  const typeTag = post.type === 'text'  ? `<span class="post-tag tag-text">TEXT</span>`
+    : post.type === 'image' ? `<span class="post-tag tag-image">IMAGE</span>`
+    : `<span class="post-tag tag-link">LINK</span>`;
+
+  const commDot = `<span style="width:16px;height:16px;border-radius:4px;background:${comm?.color||'var(--orange)'};display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;color:#fff;font-weight:900;font-family:var(--font-head);flex-shrink:0">${(comm?.name||'A')[0]}</span>`;
+
+  return `<div class="post-card" id="card-${post.id}">
+    <div class="post-card-inner">
+      <div class="post-vote">
+        <button class="vote-btn up ${voteState==='up'?'voted':''}" onclick="votePost('${post.id}','up')" title="Upvote">▲</button>
+        <span class="vote-count">${fmtNum(voteCount)}</span>
+        <button class="vote-btn down ${voteState==='down'?'voted':''}" onclick="votePost('${post.id}','down')" title="Downvote">▼</button>
+      </div>
+      <div class="post-body">
+        <div class="post-meta">
+          <span class="post-community" onclick="navigate('community','${post.communityId}')" style="color:${comm?.color||'var(--orange)'}">${commDot} ${comm?.name||'Community'}</span>
+          <span class="dot-sep">·</span>
+          <span class="post-author" onclick="navigate('profile')">u/${post.author}</span>
+          <span class="dot-sep">·</span>
+          <span class="time-ago">${timeAgo(post.createdAt)}</span>
+          ${typeTag}
+        </div>
+        <div class="post-title" onclick="navigate('post','${post.id}')">${post.title}</div>
+        ${mediaHtml}
+        <div class="post-actions">
+          <button class="post-action-btn" onclick="navigate('post','${post.id}')">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2C4.5 2 2 4.5 2 7.5c0 1.5.6 2.8 1.6 3.8L3 14l2.8-.6C6.8 13.8 7.4 14 8 14c3.5 0 6-2.5 6-5.5S11.5 2 8 2Z" stroke="currentColor" stroke-width="1.4"/></svg>
+            ${commentsCount} Comments
+          </button>
+          <button class="post-action-btn" onclick="sharePost('${post.id}')">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M11 2a2 2 0 100 4 2 2 0 000-4ZM5 8a2 2 0 100 4 2 2 0 000-4Zm6 2a2 2 0 100 4 2 2 0 000-4Z" stroke="currentColor" stroke-width="1.4"/><path d="M6.9 9.2L9.1 10.8M9.1 5.2L6.9 6.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Share
+          </button>
+          <button class="post-action-btn" onclick="requireAuth(()=>toast('Saved! 🔖'))">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 2h8a1 1 0 011 1v11l-5-3-5 3V3a1 1 0 011-1Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function votePost(postId, dir) {
+  requireAuth(() => {
+    const prev = state.votes[postId];
+    state.votes[postId] = prev === dir ? null : dir;
+    // re-render only the card
+    if (currentPage === 'home') renderFeed();
+    else if (currentPage === 'community') renderCommunityFeed(currentCommunity?.id);
+    else if (currentPage === 'post') renderPostDetail(currentPost?.id);
+  });
+}
+
+function sharePost(postId) {
+  toast('Link copied to clipboard! 🔗');
+}
+
+/* ─── TOP COMMUNITIES WIDGET ─────────────────────────── */
+function renderTopCommunities() {
+  const w = document.getElementById('topCommunitiesWidget');
+  if (!w) return;
+  const top = [...state.communities].sort((a,b)=>b.members-a.members).slice(0,5);
+  w.innerHTML = top.map((c,i) => `
+    <div class="community-card" onclick="navigate('community','${c.id}')">
+      <span class="rank-badge">${i+1}</span>
+      <div class="community-dot" style="background:${c.color}22;color:${c.color};border:1px solid ${c.color}44">${c.name[0]}</div>
+      <div class="community-info">
+        <div class="cname">${c.name}</div>
+        <div class="cmeta">${fmtNum(c.members)} members</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ─── COMMUNITIES PAGE ────────────────────────────────── */
+function renderCommunities() {
+  const grid = document.getElementById('communitiesGrid');
+  if (!grid) return;
+  grid.innerHTML = state.communities.map(c => {
+    const joined = state.joinedCommunities.includes(c.id);
+    return `<div class="community-grid-card" onclick="navigate('community','${c.id}')">
+      <div class="community-card-banner" style="background:linear-gradient(135deg,${c.color}18,${c.color}40)">
+        <div class="community-card-banner-letter" style="color:${c.color}">${c.name[0]}</div>
+        <div style="position:absolute;top:14px;left:14px;width:42px;height:42px;border-radius:12px;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#fff;font-family:var(--font-head);box-shadow:0 4px 16px rgba(0,0,0,.4)">${c.name[0]}</div>
+      </div>
+      <div class="community-card-body">
+        <div class="cname">${c.name}</div>
+        <div class="cdesc">${c.desc}</div>
+        <div class="community-card-footer">
+          <span class="member-count">👥 ${fmtNum(c.members)} members</span>
+          <button class="btn btn-sm ${joined?'btn-ghost':'btn-primary'}" onclick="event.stopPropagation();joinCommunity('${c.id}',this)">${joined?'✓ Joined':'Join'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function joinCommunity(id, btn) {
+  requireAuth(() => {
+    const idx = state.joinedCommunities.indexOf(id);
+    if (idx === -1) {
+      state.joinedCommunities.push(id);
+      const c = getCommunity(id);
+      if (c) c.members++;
+      toast(`Joined ${getCommunity(id)?.name}! 🎉`);
+    } else {
+      state.joinedCommunities.splice(idx,1);
+      const c = getCommunity(id);
+      if (c) c.members--;
+      toast('Left community');
+    }
+    renderSidebar();
+    if (currentPage === 'communities') renderCommunities();
+    if (currentPage === 'community') renderCommunityPage(currentCommunity?.id);
+  });
+}
+
+/* ─── COMMUNITY PAGE ─────────────────────────────────── */
+function renderCommunityPage(id) {
+  const c = getCommunity(id);
+  if (!c) { navigate('home'); return; }
+  currentCommunity = c;
+
+  // Banner
+  document.getElementById('communityBanner').innerHTML = `
+    <div class="community-banner-inner" style="background:linear-gradient(135deg,${c.color}08 0%,${c.color}30 50%,${c.color}08 100%)">
+      <div style="position:absolute;right:-20px;bottom:-20px;font-size:10rem;font-weight:900;font-family:var(--font-head);color:${c.color};opacity:.06;line-height:1;pointer-events:none">${c.name[0]}</div>
+    </div>`;
+
+  // Header
+  const joined = state.joinedCommunities.includes(c.id);
+  document.getElementById('communityHeader').innerHTML = `
+    <div class="community-avatar-large" style="background:${c.color};color:#fff">${c.name[0]}</div>
+    <div class="community-header-info">
+      <h1>${c.name}</h1>
+      <div class="slug">a/${c.slug}</div>
+    </div>
+    <div class="community-stats">
+      <div class="community-stat"><div class="val">${fmtNum(c.members)}</div><div class="lbl">Members</div></div>
+      <div class="community-stat"><div class="val">${state.posts.filter(p=>p.communityId===c.id).length}</div><div class="lbl">Posts</div></div>
+      <button class="btn ${joined?'btn-ghost':'btn-primary'} btn-sm" onclick="joinCommunity('${c.id}',this)">${joined?'✓ Joined':'+ Join'}</button>
+    </div>
+  `;
+
+  // About widget
+  document.getElementById('communityAbout').innerHTML = `
+    <h3><span class="wicon" style="color:${c.color}">●</span> About ${c.name}</h3>
+    <p style="font-size:.86rem;color:var(--muted);line-height:1.6;margin-bottom:14px">${c.desc}</p>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">📅 Created ${timeAgo(c.createdAt)}</div>
+    <button class="btn btn-primary btn-full btn-sm" onclick="requireAuth(()=>openCreatePost('${c.id}'))">+ Create Post</button>
+  `;
+
+  renderCommunityFeed(c.id);
+}
+
+function renderCommunityFeed(id) {
+  const feed = document.getElementById('communityFeed');
+  if (!feed) return;
+  const posts = getSortedPosts(id);
+  if (posts.length === 0) {
+    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><h3>No posts yet</h3><p>Be the first to post here!</p><button class="btn btn-primary" onclick="requireAuth(()=>openCreatePost('${id}'))">Create Post</button></div>`;
+    return;
+  }
+  feed.innerHTML = posts.map(p => renderPostCard(p)).join('');
+}
+
+/* ─── POST DETAIL ─────────────────────────────────────── */
+function renderPostDetail(id) {
+  const post = getPost(id);
+  if (!post) { navigate('home'); return; }
+  currentPost = post;
+  const comm = getCommunity(post.communityId);
+  const voteState = state.votes[post.id] || null;
+  const voteCount = post.votes + (voteState==='up'?1:voteState==='down'?-1:0);
+  const comments = state.comments.filter(c => c.postId === post.id).sort((a,b)=>b.votes-a.votes);
+
+  let mediaHtml = '';
+  if (post.type==='image' && post.imageUrl) {
+    mediaHtml = `<img class="post-detail-image" src="${post.imageUrl}" alt="Post image" onclick="openLightbox('${post.imageUrl}')"/>`;
+  } else if (post.type==='link' && post.link) {
+    mediaHtml = `<a class="post-link" href="${post.link}" target="_blank">🔗 ${post.link}</a>`;
+  }
+
+  const commentsHtml = comments.length === 0
+    ? `<div style="color:var(--muted);font-size:.9rem;text-align:center;padding:20px">No comments yet. Be the first!</div>`
+    : comments.map(c => {
+        const cv = state.commentVotes[c.id] || null;
+        const cv_count = c.votes + (cv==='up'?1:cv==='down'?-1:0);
+        return `<div class="comment-item">
+          <div class="comment-meta">
+            <span class="comment-author">${c.author}</span>
+            <span class="dot-sep">•</span>
+            <span class="time-ago">${timeAgo(c.createdAt)}</span>
+          </div>
+          <div class="comment-content">${c.content}</div>
+          <div class="comment-actions">
+            <button class="comment-vote-btn ${cv==='up'?'voted-up':''}" onclick="voteComment('${c.id}')">▲ ${fmtNum(cv_count)}</button>
+            <button class="comment-vote-btn" onclick="requireAuth(()=>toast('Reply feature coming soon!'))">↩ Reply</button>
+          </div>
+        </div>`;
+      }).join('');
+
+  document.getElementById('postDetailWrap').innerHTML = `
+    <div>
+      <!-- Back -->
+      <div style="margin-bottom:12px">
+        <button class="btn btn-ghost btn-sm" onclick="history.back()">← Back</button>
+      </div>
+      <div class="post-detail-card">
+        <div class="post-detail-vote">
+          <button class="vote-btn up ${voteState==='up'?'voted':''}" onclick="votePost('${post.id}','up')" style="font-size:1.2rem;padding:6px 10px">▲</button>
+          <span style="font-weight:700;font-size:1rem">${fmtNum(voteCount)}</span>
+          <button class="vote-btn down ${voteState==='down'?'voted':''}" onclick="votePost('${post.id}','down')" style="font-size:1.2rem;padding:6px 10px">▼</button>
+          <span style="font-size:.8rem;color:var(--muted);margin-left:8px">${Math.round(100*(post.votes/(post.votes+10)))}% upvoted</span>
+        </div>
+        <div class="post-detail-body">
+          <div class="post-meta" style="margin-bottom:10px">
+            <span class="post-community" onclick="navigate('community','${post.communityId}')" style="color:${comm?.color||'var(--orange)'}">
+              ${comm?.name}
+            </span>
+            <span class="dot-sep">•</span>
+            <span style="font-size:.8rem;color:var(--muted)">Posted by ${post.author} · ${timeAgo(post.createdAt)}</span>
+          </div>
+          <div class="post-detail-title">${post.title}</div>
+          ${mediaHtml}
+          ${post.type==='text'&&post.content ? `<div class="post-detail-content">${post.content}</div>` : ''}
+          <div class="post-actions">
+            <button class="post-action-btn" onclick="sharePost('${post.id}')">🔗 Share</button>
+            <button class="post-action-btn" onclick="requireAuth(()=>toast('Post saved!'))">🔖 Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="comments-section">
+        <div class="comments-header">💬 ${comments.length} Comment${comments.length!==1?'s':''}</div>
+        <div class="comment-box">
+          <textarea id="newCommentBox" placeholder="${state.currentUser ? 'What are your thoughts?' : 'Log in to comment…'}" ${!state.currentUser?'disabled':''}></textarea>
+          <div class="cbox-actions">
+            <button class="btn btn-primary btn-sm" onclick="submitComment('${post.id}')">Comment</button>
+          </div>
+        </div>
+        <div id="commentsList">${commentsHtml}</div>
+      </div>
+    </div>
+
+    <!-- Right sidebar -->
+    <div>
+      <div class="widget">
+        <h3><span style="color:${comm?.color}">●</span> ${comm?.name}</h3>
+        <p style="font-size:.84rem;color:var(--muted);line-height:1.5;margin-bottom:12px">${comm?.desc}</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;font-size:.84rem"><span style="color:var(--muted)">Members</span><span>${fmtNum(comm?.members||0)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.84rem"><span style="color:var(--muted)">Posts</span><span>${state.posts.filter(p=>p.communityId===comm?.id).length}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.84rem"><span style="color:var(--muted)">Created</span><span>${timeAgo(comm?.createdAt||Date.now())}</span></div>
+        </div>
+        <button class="btn btn-primary btn-full btn-sm" onclick="navigate('community','${post.communityId}')">View Community</button>
+      </div>
+    </div>
+  `;
+}
+
+function voteComment(id) {
+  requireAuth(() => {
+    const prev = state.commentVotes[id];
+    state.commentVotes[id] = prev === 'up' ? null : 'up';
+    renderPostDetail(currentPost?.id);
+  });
+}
+
+function submitComment(postId) {
+  requireAuth(() => {
+    const box = document.getElementById('newCommentBox');
+    const content = box.value.trim();
+    if (!content) { toast('Please write something'); return; }
+    const comment = {
+      id: 'cm'+randomId(),
+      postId,
+      content,
+      author: state.currentUser.username,
+      authorId: state.currentUser.id,
+      votes: 0,
+      createdAt: Date.now(),
+    };
+    state.comments.unshift(comment);
+    box.value = '';
+    renderPostDetail(postId);
+    toast('Comment posted! 💬');
+  });
+}
+
+/* ─── PROFILE ────────────────────────────────────────── */
+function renderProfile(userId) {
+  const user = state.currentUser;
+  if (!user) { openAuthModal('login'); return; }
+
+  const profileTop = document.getElementById('profileTop');
+  profileTop.innerHTML = `
+    <div class="profile-avatar-big" style="background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff">${user.avatar}</div>
+    <div>
+      <div class="profile-name">${user.username}</div>
+      <div class="profile-handle">u/${user.username} · Joined ${timeAgo(user.joinedAt)}</div>
+      <div style="margin-top:8px"><span class="badge badge-orange">✦ Builder</span></div>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="val">${fmtNum(user.karma + state.posts.filter(p=>p.authorId===user.id).length*10)}</div>
+        <div class="lbl">Karma</div>
+      </div>
+      <div class="profile-stat">
+        <div class="val">${state.posts.filter(p=>p.authorId===user.id).length}</div>
+        <div class="lbl">Posts</div>
+      </div>
+      <div class="profile-stat">
+        <div class="val">${state.comments.filter(c=>c.authorId===user.id).length}</div>
+        <div class="lbl">Comments</div>
+      </div>
+    </div>
+  `;
+
+  switchProfileTab('posts');
+}
+
+function switchProfileTab(tab, btn) {
+  profileTab = tab;
+  document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const user = state.currentUser;
+  if (!user) return;
+  const cont = document.getElementById('profileContent');
+
+  if (tab === 'posts') {
+    const userPosts = state.posts.filter(p => p.authorId === user.id);
+    if (userPosts.length === 0) {
+      cont.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><h3>No posts yet</h3><p>Share something with the community!</p><button class="btn btn-primary" onclick="requireAuth(()=>openCreatePost())">Create Post</button></div>`;
+    } else {
+      cont.innerHTML = userPosts.map(p => renderPostCard(p)).join('');
+    }
+  } else if (tab === 'comments') {
+    const userComments = state.comments.filter(c => c.authorId === user.id);
+    if (userComments.length === 0) {
+      cont.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><h3>No comments yet</h3><p>Join the conversation!</p></div>`;
+    } else {
+      cont.innerHTML = userComments.map(c => {
+        const post = getPost(c.postId);
+        return `<div class="comment-item" style="cursor:pointer" onclick="navigate('post','${c.postId}')">
+          <div class="comment-meta">
+            <span style="color:var(--orange)">on: ${post?.title||'Post'}</span>
+            <span class="dot-sep">•</span>
+            <span class="time-ago">${timeAgo(c.createdAt)}</span>
+          </div>
+          <div class="comment-content">${c.content}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:8px">▲ ${c.votes} upvotes</div>
+        </div>`;
+      }).join('');
+    }
+  } else if (tab === 'communities') {
+    if (state.joinedCommunities.length === 0) {
+      cont.innerHTML = `<div class="empty-state"><div class="empty-icon">🌐</div><h3>No communities yet</h3><p>Explore and join communities!</p><button class="btn btn-primary" onclick="navigate('communities')">Browse Communities</button></div>`;
+    } else {
+      cont.innerHTML = `<div class="communities-grid">${state.joinedCommunities.map(cid => {
+        const c = getCommunity(cid);
+        if (!c) return '';
+        return `<div class="community-grid-card" onclick="navigate('community','${c.id}')">
+          <div class="community-card-banner" style="background:linear-gradient(135deg,${c.color}22,${c.color}66)">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;font-family:var(--font-head);color:${c.color};opacity:.6">${c.name[0]}</div>
+          </div>
+          <div class="community-card-body">
+            <div class="cname">${c.name}</div>
+            <div class="cdesc">${c.desc}</div>
+            <div class="community-card-footer"><span class="member-count">👥 ${fmtNum(c.members)}</span></div>
+          </div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+  }
+}
+
+/* ─── CREATE POST ────────────────────────────────────── */
+function openCreatePost(communityId) {
+  // populate community dropdown
+  const sel = document.getElementById('postCommunity');
+  sel.innerHTML = state.communities.map(c =>
+    `<option value="${c.id}" ${c.id===communityId?'selected':''}>${c.name}</option>`
+  ).join('');
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postContent').value = '';
+  document.getElementById('postLink').value = '';
+  clearImage();
+  switchPostType('text', document.querySelector('.tab-btn'));
+  document.getElementById('createPostModal').classList.add('open');
+}
+
+function switchPostType(type, btn) {
+  state.postType = type;
+  document.querySelectorAll('#createPostModal .tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('textArea').style.display  = type==='text'  ? '' : 'none';
+  document.getElementById('imageArea').style.display = type==='image' ? '' : 'none';
+  document.getElementById('linkArea').style.display  = type==='link'  ? '' : 'none';
+}
+
+function handleImageSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    state.currentImageData = ev.target.result;
+    document.getElementById('previewImg').src = ev.target.result;
+    document.getElementById('imagePreview').style.display = '';
+    document.getElementById('imageDropZone').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleImageDrop(e) {
+  e.preventDefault();
+  document.getElementById('imageDropZone').style.borderColor = 'var(--border)';
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    document.getElementById('imageFileInput').files = e.dataTransfer.files;
+    handleImageSelect({ target: { files: [file] } });
+  }
+}
+
+function clearImage() {
+  state.currentImageData = null;
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('imageDropZone').style.display = '';
+  document.getElementById('imageFileInput').value = '';
+}
+
+function submitPost() {
+  if (!state.currentUser) { toast('Please log in'); return; }
+  const title = document.getElementById('postTitle').value.trim();
+  const communityId = document.getElementById('postCommunity').value;
+  if (!title) { toast('Please add a title'); return; }
+  if (!communityId) { toast('Please select a community'); return; }
+
+  const post = {
+    id: 'p'+randomId(),
+    title,
+    type: state.postType,
+    communityId,
+    author: state.currentUser.username,
+    authorId: state.currentUser.id,
+    votes: 1,
+    createdAt: Date.now(),
+    comments: 0,
+  };
+
+  if (state.postType === 'text') {
+    post.content = document.getElementById('postContent').value.trim();
+  } else if (state.postType === 'image') {
+    post.imageUrl = state.currentImageData || 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80';
+  } else if (state.postType === 'link') {
+    post.link = document.getElementById('postLink').value.trim();
+    if (!post.link) { toast('Please add a URL'); return; }
+  }
+
+  state.posts.unshift(post);
+  state.votes[post.id] = 'up';
+  closeModal('createPostModal');
+  toast('Post created! 🚀');
+  navigate('post', post.id);
+}
+
+/* ─── CREATE COMMUNITY ────────────────────────────────── */
+function openCreateCommunity() {
+  document.getElementById('communityName').value = '';
+  document.getElementById('communityDesc').value = '';
+  document.getElementById('slugPreview').textContent = '…';
+  renderColorPicker();
+  document.getElementById('createCommunityModal').classList.add('open');
+}
+
+function renderColorPicker() {
+  const picker = document.getElementById('colorPicker');
+  picker.innerHTML = COMMUNITY_COLORS.map(c =>
+    `<div onclick="selectColor('${c}',this)" style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;border:3px solid ${c===state.selectedColor?'#fff':'transparent'};transition:border-color .2s" title="${c}"></div>`
+  ).join('');
+}
+
+function selectColor(c, el) {
+  state.selectedColor = c;
+  document.querySelectorAll('#colorPicker div').forEach(d => d.style.borderColor = 'transparent');
+  el.style.borderColor = '#fff';
+}
+
+function updateSlugPreview(val) {
+  document.getElementById('slugPreview').textContent = slugify(val) || '…';
+}
+
+function submitCommunity() {
+  if (!state.currentUser) { toast('Please log in'); return; }
+  const name = document.getElementById('communityName').value.trim();
+  const desc = document.getElementById('communityDesc').value.trim();
+  if (!name || name.length < 3) { toast('Name must be at least 3 characters'); return; }
+  if (!desc) { toast('Please add a description'); return; }
+
+  const slug = slugify(name);
+  if (state.communities.find(c=>c.slug===slug)) { toast('Community name already taken'); return; }
+
+  const community = {
+    id: 'c'+randomId(),
+    name,
+    slug,
+    desc,
+    color: state.selectedColor,
+    members: 1,
+    createdAt: Date.now(),
+  };
+  state.communities.push(community);
+  state.joinedCommunities.push(community.id);
+  closeModal('createCommunityModal');
+  renderSidebar();
+  toast(`Community "${name}" created! 🌐`);
+  navigate('community', community.id);
+}
+
+/* ─── SEARCH ─────────────────────────────────────────── */
+let searchTimeout;
+function handleSearch(val) {
+  clearTimeout(searchTimeout);
+  if (!val.trim()) return;
+  searchTimeout = setTimeout(() => {
+    navigate('search');
+    document.getElementById('searchTerm').textContent = val;
+    switchSearchTab('posts', document.querySelector('#page-search .tab-btn'));
+    renderSearchResults(val);
+  }, 400);
+}
+
+function renderSearchResults(query, tab) {
+  const q = query.toLowerCase();
+  const res = document.getElementById('searchResults');
+  const currentTab = tab || searchTab;
+
+  if (currentTab === 'posts') {
+    const posts = state.posts.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      (p.content||'').toLowerCase().includes(q)
+    );
+    res.innerHTML = posts.length === 0
+      ? `<div class="empty-state"><div class="empty-icon">🔍</div><h3>No posts found</h3><p>Try different keywords</p></div>`
+      : posts.map(p => renderPostCard(p)).join('');
+  } else {
+    const comms = state.communities.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.desc.toLowerCase().includes(q)
+    );
+    res.innerHTML = comms.length === 0
+      ? `<div class="empty-state"><div class="empty-icon">🔍</div><h3>No communities found</h3></div>`
+      : `<div class="communities-grid">${comms.map(c => `
+        <div class="community-grid-card" onclick="navigate('community','${c.id}')">
+          <div class="community-card-banner" style="background:linear-gradient(135deg,${c.color}22,${c.color}66)"></div>
+          <div class="community-card-body">
+            <div class="cname">${c.name}</div>
+            <div class="cdesc">${c.desc}</div>
+            <div class="community-card-footer"><span class="member-count">👥 ${fmtNum(c.members)}</span></div>
+          </div>
+        </div>`).join('')}</div>`;
+  }
+}
+
+function switchSearchTab(tab, btn) {
+  searchTab = tab;
+  document.querySelectorAll('#page-search .tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const q = document.getElementById('searchTerm').textContent;
+  renderSearchResults(q, tab);
+}
+
+/* ─── LIGHTBOX ───────────────────────────────────────── */
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+/* ─── INIT ────────────────────────────────────────────── */
+function init() {
+  seedData();
+  updateNavAuth();
+  navigate('home');
+}
+
+init();
+</script>
+</body>
+</html>
